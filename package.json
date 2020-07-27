@@ -1,0 +1,55 @@
+{
+	"name": "helpdeskbackend",
+	"version": "0.0.1",
+	"description": "HelpDesk app NodeJs, Express, API, JWT, Passport.js",
+	"main": "src/index.js",
+	"scripts": {
+		"start": "nodemon --exec npm run babel-node -- ./src/index.js",
+		"babel-node": "babel-node --presets=env",
+		"build": "babel src -d dist",
+		"debug": "babel src -d dist --watch --source-maps"
+	},
+	"keywords": [
+		"helpdesk",
+		"node",
+		"express",
+		"api",
+		"jwt",
+		"passport.js"
+	],
+	"author": "Szymon Guzik",
+	"license": "MIT",
+	"devDependencies": {
+		"babel": "^6.23.0",
+		"babel-cli": "^6.26.0",
+		"babel-preset-env": "^1.7.0",
+		"concurrently": "^5.2.0",
+		"eslint": "^7.5.0",
+		"eslint-config-airbnb-base": "^14.2.0",
+		"eslint-config-prettier": "^6.11.0",
+		"eslint-plugin-import": "^2.22.0",
+		"eslint-plugin-prettier": "^3.1.4",
+		"husky": "^4.2.5",
+		"lint-staged": "^10.2.11",
+		"nodemon": "^2.0.4",
+		"prettier": "^2.0.5",
+		"pretty-quick": "^2.0.1"
+	},
+	"husky": {
+		"hooks": {
+			"pre-commit": "lint-staged"
+		}
+	},
+	"lint-staged": {
+		"src/**/*.js": [
+			"pretty-quick --staged",
+			"eslint src/ --fix",
+			"git add"
+		]
+	},
+	"dependencies": {
+		"body-parser": "^1.19.0",
+		"chalk": "^4.1.0",
+		"express": "^4.17.1"
+	}
+}
