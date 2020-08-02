@@ -6,12 +6,12 @@ import chalk from 'chalk';
 
 const app = express();
 
-// Middlewares
+// Middleware
 app.use(bodyParser.json());
 
 // Routes
 app.get('/', (req, res) => {
-	res.send('hello world');
+	res.send('hello world!!');
 });
 
 /* eslint no-console: 0 */
