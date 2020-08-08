@@ -2,12 +2,14 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
 import chalk from 'chalk';
+import morgan from 'morgan';
 
 import usersRoutes from './routes/userRouter';
 
 const app = express();
 
 // Middleware
+app.use(morgan('dev'));
 app.use(bodyParser.json());
 
 // Routes
