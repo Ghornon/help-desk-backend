@@ -3,8 +3,12 @@ import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
 import chalk from 'chalk';
 import morgan from 'morgan';
+import swaggerUi from 'swagger-ui-express';
+import YAML from 'yamljs';
 
 import usersRoutes from './routes/userRouter';
+
+const swaggerDocument = YAML.load('./swagger.yaml');
 
 const app = express();
 
@@ -12,7 +16,14 @@ const app = express();
 app.use(morgan('dev'));
 app.use(bodyParser.json());
 
-// Routes
+app.use(
+	'/api/docs',
+	swaggerUi.serve,
+	swaggerUi.setup(swaggerDocument, {
+		explorer: true,
+	})
+);
+
 app.get('/', (req, res) => {
 	res.send('hello world!!');
 });

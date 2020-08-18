@@ -4,7 +4,18 @@ const validateBody = (schema) => (req, res, next) => {
 	const result = schema.validate(req.body);
 
 	if (result.error) {
-		return res.status(400).json({ error: result.error.details });
+		const {
+			message,
+			type,
+			context: { label },
+		} = result.error.details[0];
+
+		return res.status(400).json({
+			code: 400,
+			message,
+			type,
+			context: label,
+		});
 	}
 
 	return next();
@@ -15,7 +26,7 @@ const schemas = {
 		username: Joi.string().required(),
 		password: Joi.string().required(),
 	}),
-	signUpSchema: Joi.object().keys({
+	UserSchema: Joi.object().keys({
 		username: Joi.string().min(5).required(),
 		email: Joi.string().email().required(),
 		password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')),

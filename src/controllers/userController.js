@@ -15,18 +15,10 @@ const signUp = async (req, res) => {
 
 	if (isUserExist) {
 		return res.status(409).json({
-			error: [
-				{
-					message: 'Username already taken!',
-					path: 'username',
-					type: 'string',
-					context: {
-						value: username,
-						label: 'username',
-						key: 'username',
-					},
-				},
-			],
+			code: 409,
+			message: '"Username" already taken!',
+			type: 'client.conflict',
+			context: 'username',
 		});
 	}
 
@@ -38,16 +30,16 @@ const signUp = async (req, res) => {
 		password: hash,
 		firstName,
 		lastName,
+		power: 1,
 	});
 
 	await newUser.save((err, doc) => {
 		if (err)
 			return res.status(500).json({
-				error: [
-					{
-						message: 'Internal server error',
-					},
-				],
+				code: 500,
+				message: 'Internal Server Error',
+				type: 'server.internal',
+				context: 'server',
 			});
 		return doc;
 	});
@@ -58,10 +50,45 @@ const signUp = async (req, res) => {
 		email,
 		firstName,
 		lastName,
+		power: 1,
 	});
+};
+
+const getUserById = async (req, res) => {
+	const { userId } = req.params;
+
+	const user = await UserModel.findById(userId).exec();
+
+	if (!user)
+		return res.status(404).json({
+			code: 404,
+			message: 'User not found',
+			type: 'client.notFound',
+			context: 'userId',
+		});
+
+	return res.status(200).json({ user });
+};
+
+const getUsers = async (req, res) => {
+	const { username = '', email = '', firstName = '', lastName = '' } = req.query;
+
+	const users = UserModel.find({ username, email, firstName, lastName });
+
+	if (!users)
+		return res.status(404).json({
+			code: 404,
+			message: 'Users not found',
+			type: 'client.notFound',
+			context: 'users',
+		});
+
+	return res.status(200).json({ users });
 };
 
 export default {
 	signIn,
 	signUp,
+	getUserById,
+	getUsers,
 };

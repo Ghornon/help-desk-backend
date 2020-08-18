@@ -1,0 +1,302 @@
+swagger: '2.0'
+info:
+    description: This is simple API for Help Desk application.
+    version: 0.1.0
+    title: Help Desk API
+    license:
+        name: MIT
+        url: 'localhost:8080/LICENSE'
+host: localhost:8080
+basePath: /v1
+tags:
+    - name: Auth
+    - name: Users
+schemes:
+    - http
+paths:
+    /auth:
+        post:
+            tags:
+                - Auth
+            summary: Sign up new user.
+            description: Sign up new user.
+            operationId: signUp
+            produces:
+                - application/json
+            parameters:
+                - in: body
+                  name: body
+                  required: true
+                  schema:
+                      type: object
+                      properties:
+                          username:
+                              type: string
+                              example: joe.doe
+                          firstName:
+                              type: string
+                              example: Joe
+                          lastName:
+                              type: string
+                              example: Doe
+                          email:
+                              type: string
+                              example: joe.doe@email.com
+                          password:
+                              type: string
+                              example: Password1
+                          repeatPassword:
+                              type: string
+                              example: Password1
+                          power:
+                              type: integer
+                              format: int64
+                              example: 1
+            responses:
+                '201':
+                    description: Created
+                    schema:
+                        $ref: '#/definitions/Token'
+                '409':
+                    description: Conflict
+                '500':
+                    description: Internal server error
+    /auth/login:
+        post:
+            tags:
+                - Auth
+            summary: Login user
+            description: Exchange credentials for token.
+            operationId: login
+            produces:
+                - application/json
+            parameters:
+                - in: body
+                  name: body
+                  required: true
+                  schema:
+                      type: object
+                      properties:
+                          username:
+                              type: string
+                              example: joe.doe
+                          password:
+                              type: string
+                              example: Password1
+            responses:
+                '200':
+                    description: Ok
+                    schema:
+                        $ref: '#/definitions/Token'
+                '401':
+                    description: Unauthorized
+                '500':
+                    description: Internal server error
+    /users:
+        get:
+            tags:
+                - Users
+            summary: Get array of users
+            description: This can only be done by the logged in user with administrator privilege.
+            operationId: getUsers
+            security:
+                - api_key: []
+            produces:
+                - application/json
+            parameters:
+                - name: username111
+                  in: query
+                  description: Username of user to return
+                  type: string
+                - name: email
+                  in: query
+                  description: Email of user to return
+                  type: string
+                - name: firstName
+                  in: query
+                  description: First name of user to return
+                  type: string
+                - name: lastName
+                  in: query
+                  description: Last name of user to return
+                  type: string
+            responses:
+                '200':
+                    description: Ok
+                    schema:
+                        type: array
+                        items:
+                            $ref: '#/definitions/User'
+                '404':
+                    description: Not found
+        post:
+            tags:
+                - Users
+            summary: Create user
+            description: This can only be done by the logged in user with administrator privilege.
+            operationId: createUser
+            security:
+                - api_key: []
+            produces:
+                - application/json
+            parameters:
+                - in: body
+                  name: body
+                  required: true
+                  schema:
+                      type: object
+                      properties:
+                          username:
+                              type: string
+                              example: joe.doe
+                          firstName:
+                              type: string
+                              example: Joe
+                          lastName:
+                              type: string
+                              example: Doe
+                          email:
+                              type: string
+                              example: joe.doe@email.com
+                          password:
+                              type: string
+                              example: Password1
+                          repeatPassword:
+                              type: string
+                              example: Password1
+                          power:
+                              type: integer
+                              format: int64
+                              example: 1
+            responses:
+                '201':
+                    description: Created
+                    schema:
+                        $ref: '#/definitions/User'
+                '409':
+                    description: Conflict
+                '500':
+                    description: Internal server error
+    '/users/{userId}':
+        get:
+            tags:
+                - Users
+            summary: Get user by id
+            description: This can only be done by the logged in user with administrator privilege.
+            parameters:
+                - name: userId
+                  in: path
+                  description: ID of user to return
+                  required: true
+                  type: string
+            operationId: getUserById
+            security:
+                - api_key: []
+            produces:
+                - application/json
+            responses:
+                '200':
+                    description: Ok
+                    schema:
+                        $ref: '#/definitions/User'
+                '404':
+                    description: Not found
+                    schema:
+                        $ref: '#/definitions/Error'
+        put:
+            tags:
+                - Users
+            summary: Update user by id
+            description: This can only be done by the logged in user with administrator privilege.
+            parameters:
+                - name: userId
+                  in: path
+                  description: ID of user to return
+                  required: true
+                  type: string
+            operationId: updateUser
+            security:
+                - api_key: []
+            produces:
+                - application/json
+            responses:
+                '200':
+                    description: Ok
+                    schema:
+                        $ref: '#/definitions/User'
+                '404':
+                    description: Not found
+                '409':
+                    description: Conflict
+                '500':
+                    description: Internal server error
+        delete:
+            tags:
+                - Users
+            summary: Update user by id
+            description: This can only be done by the logged in user with administrator privilege.
+            parameters:
+                - name: userId
+                  in: path
+                  description: ID of user to return
+                  required: true
+                  type: string
+            operationId: deleteUser
+            security:
+                - api_key: []
+            produces:
+                - application/json
+            responses:
+                '200':
+                    description: Ok
+                    schema:
+                        $ref: '#/definitions/User'
+                '404':
+                    description: Not found
+                '500':
+                    description: Internal server error
+securityDefinitions:
+    api_key:
+        type: apiKey
+        name: Authorization
+        in: header
+definitions:
+    Token:
+        type: object
+        properties:
+            token:
+                type: string
+                example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
+    Error:
+        type: object
+        properties:
+            code:
+                type: integer
+                format: int32
+            message:
+                type: string
+            type:
+                type: string
+            context:
+                type: string
+    User:
+        type: object
+        properties:
+            _id:
+                type: string
+                example: 5f3bfd5d89770929a060e226
+            username:
+                type: string
+                example: joe.doe
+            firstName:
+                type: string
+                example: Joe
+            lastName:
+                type: string
+                example: Doe
+            email:
+                type: string
+                example: joe.doe@email.com
+            power:
+                type: integer
+                example: 1
