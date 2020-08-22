@@ -1,15 +1,43 @@
 import UserModel from '../models/userModel';
-import { genHash, signToken } from '../helpers/auth';
+import { genHash } from '../helpers/auth';
 
-const signIn = async (req, res) => {
-	const { _id } = req.user;
-	const token = signToken(_id);
+const getUserById = async (req, res, next) => {
+	const { userId } = req.params;
 
-	return res.status(200).json({ token });
+	const user = await UserModel.findById(userId).exec();
+
+	if (!user)
+		return res.status(404).json({
+			code: 404,
+			message: 'User not found',
+			type: 'client.notFound',
+			context: 'userId',
+		});
+
+	req.subject = user;
+	return next();
 };
 
-const signUp = async (req, res) => {
-	const { username, email, password, firstName, lastName } = req.body;
+const getOneUser = (req, res) => {
+	return res.status(200).json(req.subject);
+};
+
+const getMultipleUsers = async (req, res) => {
+	const users = await UserModel.find(req.query).exec();
+
+	if (!users)
+		return res.status(404).json({
+			code: 404,
+			message: 'Users not found',
+			type: 'client.notFound',
+			context: 'users',
+		});
+
+	return res.status(200).json(users);
+};
+
+const createUser = async (req, res) => {
+	const { username, email, password, firstName, lastName, power = 1 } = req.body;
 
 	const isUserExist = await UserModel.findOne({ username }).exec();
 
@@ -30,19 +58,10 @@ const signUp = async (req, res) => {
 		password: hash,
 		firstName,
 		lastName,
-		power: 1,
+		power,
 	});
 
-	await newUser.save((err, doc) => {
-		if (err)
-			return res.status(500).json({
-				code: 500,
-				message: 'Internal Server Error',
-				type: 'server.internal',
-				context: 'server',
-			});
-		return doc;
-	});
+	await newUser.save();
 
 	return res.status(201).json({
 		_id: newUser.id,
@@ -50,45 +69,55 @@ const signUp = async (req, res) => {
 		email,
 		firstName,
 		lastName,
-		power: 1,
+		power,
 	});
 };
 
-const getUserById = async (req, res) => {
-	const { userId } = req.params;
+const updateUser = async (req, res) => {
+	const { _id } = req.subject;
+	const { username, password } = req.body;
 
-	const user = await UserModel.findById(userId).exec();
+	if (username) {
+		const isUserExist = await UserModel.findOne({ username }).exec();
 
-	if (!user)
-		return res.status(404).json({
-			code: 404,
-			message: 'User not found',
-			type: 'client.notFound',
-			context: 'userId',
-		});
+		if (isUserExist) {
+			return res.status(409).json({
+				code: 409,
+				message: '"Username" already taken!',
+				type: 'client.conflict',
+				context: 'username',
+			});
+		}
+	}
 
-	return res.status(200).json({ user });
+	const hash = await genHash(password);
+
+	const user = await UserModel.findById(_id).select('password');
+
+	user.set(req.body);
+
+	if (password) {
+		user.set('password', hash);
+	}
+
+	await user.save();
+
+	return res.status(200).json(user);
 };
 
-const getUsers = async (req, res) => {
-	const { username = '', email = '', firstName = '', lastName = '' } = req.query;
+const deleteUser = async (req, res) => {
+	const { _id } = req.subject;
 
-	const users = UserModel.find({ username, email, firstName, lastName });
+	await UserModel.deleteOne({ _id });
 
-	if (!users)
-		return res.status(404).json({
-			code: 404,
-			message: 'Users not found',
-			type: 'client.notFound',
-			context: 'users',
-		});
-
-	return res.status(200).json({ users });
+	return res.status(200).json(req.subject);
 };
 
 export default {
-	signIn,
-	signUp,
 	getUserById,
-	getUsers,
+	getOneUser,
+	getMultipleUsers,
+	createUser,
+	updateUser,
+	deleteUser,
 };

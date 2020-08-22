@@ -10,7 +10,7 @@ const userSchema = new Schema(
 		email: String,
 		firstName: String,
 		lastName: String,
-		groups: [{ name: String, power: Number }],
+		power: Number,
 	},
 	{ timestamps: true }
 );

@@ -6,7 +6,7 @@ import morgan from 'morgan';
 import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
 
-import usersRoutes from './routes/userRouter';
+import { authRouter, usersRouter } from './routers';
 
 const swaggerDocument = YAML.load('./swagger.yaml');
 
@@ -28,7 +28,7 @@ app.get('/', (req, res) => {
 	res.send('hello world!!');
 });
 
-app.use('/api/users', usersRoutes);
+app.use('/api/', authRouter, usersRouter);
 
 mongoose.connect('mongodb://localhost:27017/help-desk', {
 	useNewUrlParser: true,

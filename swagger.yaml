@@ -7,7 +7,7 @@ info:
         name: MIT
         url: 'localhost:8080/LICENSE'
 host: localhost:8080
-basePath: /v1
+basePath: /api
 tags:
     - name: Auth
     - name: Users
@@ -104,7 +104,7 @@ paths:
             produces:
                 - application/json
             parameters:
-                - name: username111
+                - name: username
                   in: query
                   description: Username of user to return
                   type: string
