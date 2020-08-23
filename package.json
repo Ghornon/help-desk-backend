@@ -4,10 +4,12 @@
 	"description": "HelpDesk app Node.js, Express, API, JWT, Passport.js",
 	"main": "src/index.js",
 	"scripts": {
-		"start": "node dist/index.js",
-		"develop": "nodemon --exec babel-node ./src/index.js",
+		"start": "node dist/server.js",
+		"develop": "nodemon --exec babel-node ./src/server.js",
 		"build": "babel src -d dist",
-		"debug": "babel src -d dist --watch --source-maps"
+		"debug": "babel src -d dist --watch --source-maps",
+		"test": "jest",
+		"test:watch": "jest --watch"
 	},
 	"keywords": [
 		"help",
@@ -41,20 +43,24 @@
 		"@babel/core": "^7.11.0",
 		"@babel/node": "^7.10.5",
 		"@babel/preset-env": "^7.11.0",
+		"babel-jest": "^26.3.0",
 		"eslint": "^7.5.0",
 		"eslint-config-airbnb-base": "^14.2.0",
 		"eslint-config-prettier": "^6.11.0",
 		"eslint-plugin-import": "^2.22.0",
 		"eslint-plugin-prettier": "^3.1.4",
 		"husky": "^4.2.5",
+		"jest": "^26.4.2",
 		"lint-staged": "^10.2.11",
 		"nodemon": "^2.0.4",
 		"prettier": "^2.0.5",
-		"pretty-quick": "^2.0.1"
+		"pretty-quick": "^2.0.1",
+		"supertest": "^4.0.2"
 	},
 	"husky": {
 		"hooks": {
-			"pre-commit": "lint-staged"
+			"pre-commit": "lint-staged",
+			"pre-push": "npm test"
 		}
 	},
 	"lint-staged": {
@@ -74,6 +80,12 @@
 					}
 				}
 			]
+		]
+	},
+	"jest": {
+		"testEnvironment": "node",
+		"coveragePathIgnorePatterns": [
+			"/node_modules/"
 		]
 	}
 }
