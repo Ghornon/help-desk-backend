@@ -10,14 +10,14 @@ import { authRouter, usersRouter } from './routers';
 class App {
 	constructor() {
 		this.express = express();
-		connect();
+		if (process.env.NODE_ENV !== 'test') connect();
 
 		this.middlewares();
 		this.routes();
 	}
 
 	middlewares() {
-		this.express.use(morgan('dev'));
+		if (process.env.NODE_ENV === 'dev') this.express.use(morgan('dev'));
 		this.express.use(bodyParser.json());
 	}
 

@@ -17,5 +17,10 @@
 		"semi": ["error", "always"],
 		"no-console": 1,
 		"no-tabs": 0
+	},
+	"settings": {
+		"import/resolver": {
+			"babel-module": {}
+		}
 	}
 }

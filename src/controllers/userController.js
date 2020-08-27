@@ -78,7 +78,7 @@ const updateUser = async (req, res) => {
 	const { username, password } = req.body;
 
 	if (username) {
-		const isUserExist = await UserModel.findOne({ username }).exec();
+		const isUserExist = await UserModel.findOne({ username }).populate('password').exec();
 
 		if (isUserExist) {
 			return res.status(409).json({
@@ -90,19 +90,20 @@ const updateUser = async (req, res) => {
 		}
 	}
 
-	const hash = await genHash(password);
-
-	const user = await UserModel.findById(_id).select('password');
+	const user = await UserModel.findById(_id).exec();
 
 	user.set(req.body);
 
 	if (password) {
+		const hash = await genHash(password);
 		user.set('password', hash);
 	}
 
 	await user.save();
 
-	return res.status(200).json(user);
+	const updatedUser = await UserModel.findById(_id).exec();
+
+	return res.status(200).json(updatedUser);
 };
 
 const deleteUser = async (req, res) => {

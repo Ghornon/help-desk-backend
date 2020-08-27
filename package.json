@@ -5,11 +5,11 @@
 	"main": "src/index.js",
 	"scripts": {
 		"start": "node dist/server.js",
-		"develop": "nodemon --exec babel-node ./src/server.js",
+		"develop": "NODE_ENV=dev nodemon --exec babel-node ./src/server.js",
 		"build": "babel src -d dist",
 		"debug": "babel src -d dist --watch --source-maps",
-		"test": "jest",
-		"test:watch": "jest --watch"
+		"test": "NODE_ENV=test jest",
+		"test:watch": "NODE_ENV=test jest --watch"
 	},
 	"keywords": [
 		"help",
@@ -44,14 +44,17 @@
 		"@babel/node": "^7.10.5",
 		"@babel/preset-env": "^7.11.0",
 		"babel-jest": "^26.3.0",
+		"babel-plugin-module-resolver": "^4.0.0",
 		"eslint": "^7.5.0",
 		"eslint-config-airbnb-base": "^14.2.0",
 		"eslint-config-prettier": "^6.11.0",
+		"eslint-import-resolver-babel-module": "^5.1.2",
 		"eslint-plugin-import": "^2.22.0",
 		"eslint-plugin-prettier": "^3.1.4",
 		"husky": "^4.2.5",
 		"jest": "^26.4.2",
 		"lint-staged": "^10.2.11",
+		"mongodb-memory-server": "^6.6.5",
 		"nodemon": "^2.0.4",
 		"prettier": "^2.0.5",
 		"pretty-quick": "^2.0.1",
@@ -80,12 +83,29 @@
 					}
 				}
 			]
+		],
+		"plugins": [
+			[
+				"module-resolver",
+				{
+					"root": [
+						"./src"
+					],
+					"alias": {
+						"tests": "./tests",
+						"helpers": "./src/helpers"
+					}
+				}
+			]
 		]
 	},
 	"jest": {
-		"testEnvironment": "node",
 		"coveragePathIgnorePatterns": [
 			"/node_modules/"
-		]
+		],
+		"setupFilesAfterEnv": [
+			"<rootDir>/tests/setupAfterEnv.js"
+		],
+		"testEnvironment": "node"
 	}
 }
