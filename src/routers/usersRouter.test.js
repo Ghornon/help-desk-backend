@@ -1,5 +1,5 @@
 import supertest from 'supertest';
-import testHelper from 'tests/testHelper';
+import testHelper from '../../tests/testHelper';
 import app from '../app';
 
 const req = supertest(app);
@@ -21,10 +21,36 @@ beforeAll(async () => {
 	token = await testHelper.getToken();
 });
 
-describe('/api/users', () => {
-	it('GET multiple users', async (done) => {
+describe('GET /api/users', () => {
+	it('It should return unauthorize error status code', async (done) => {
+		const { status } = await req.get('/api/users');
+
+		expect(status).toBe(401);
+		done();
+	});
+
+	it('It should return array of users', async (done) => {
 		const { status, body } = await req
 			.get('/api/users')
+			.set({ Authorization: token, Accept: 'application/json' });
+
+		expect(status).toBe(200);
+		expect(Array.isArray(body)).toBe(true);
+
+		body.forEach((currentUser) => {
+			Object.keys(user).forEach((key) => {
+				if (key === 'password' || key === 'repeatPassword')
+					return expect(currentUser).not.toHaveProperty(key);
+				return expect(currentUser).toHaveProperty(key);
+			});
+		});
+
+		done();
+	});
+
+	it('It should return array with single user object', async (done) => {
+		const { status, body } = await req
+			.get('/api/users?username=admin')
 			.set({ Authorization: token, Accept: 'application/json' });
 
 		expect(status).toBe(200);
@@ -38,8 +64,26 @@ describe('/api/users', () => {
 
 		done();
 	});
+});
 
-	it('POST user', async (done) => {
+describe('POST /api/users', () => {
+	it('It should return unauthorize error status code', async (done) => {
+		const { status } = await req.post('/api/users').send(user);
+
+		expect(status).toBe(401);
+		done();
+	});
+
+	it('It should return bad request error status code', async (done) => {
+		const { status } = await req
+			.post('/api/users')
+			.set({ Authorization: token, Accept: 'application/json' });
+
+		expect(status).toBe(400);
+		done();
+	});
+
+	it('It should create new user', async (done) => {
 		const { status, body } = await req
 			.post('/api/users')
 			.send(user)
@@ -53,8 +97,17 @@ describe('/api/users', () => {
 
 		done();
 	});
+});
 
-	it('GET user by id', async (done) => {
+describe('GET /api/users/:id', () => {
+	it('It should return unauthorize error status code', async (done) => {
+		const { status } = await req.get(`/api/users/${userId}`);
+
+		expect(status).toBe(401);
+		done();
+	});
+
+	it('It should get user by the given id', async (done) => {
 		const { status, body } = await req
 			.get(`/api/users/${userId}`)
 			.set({ Authorization: token, Accept: 'application/json' });
@@ -69,8 +122,31 @@ describe('/api/users', () => {
 
 		done();
 	});
+});
 
-	it('PUT user', async (done) => {
+describe('PUT /api/users/:id', () => {
+	it('It should return unauthorize error status code', async (done) => {
+		const { status } = await req.put(`/api/users/${userId}`);
+
+		expect(status).toBe(401);
+		done();
+	});
+
+	it('It should return bad request error status code', async (done) => {
+		const updatedUser = {
+			badProperty: null,
+		};
+
+		const { status } = await req
+			.put(`/api/users/${userId}`)
+			.send(updatedUser)
+			.set({ Authorization: token, Accept: 'application/json' });
+
+		expect(status).toBe(400);
+		done();
+	});
+
+	it('It should update user by the given id', async (done) => {
 		const updatedUser = {
 			username: 'updated.user',
 			password: 'aaa123',
@@ -98,21 +174,17 @@ describe('/api/users', () => {
 
 		done();
 	});
+});
 
-	it('Login user', async (done) => {
-		const { username, password } = user;
-		const { status, body } = await req
-			.post('/api/auth/login')
-			.send({ username, password })
-			.set('Accept', 'application/json');
+describe('DELETE /api/users/:id', () => {
+	it('It should return unauthorize error status code', async (done) => {
+		const { status } = await req.delete(`/api/users/${userId}`);
 
-		expect(status).toBe(200);
-		expect(body).toHaveProperty('token');
-
+		expect(status).toBe(401);
 		done();
 	});
 
-	it('DELETE user', async (done) => {
+	it('It should delete user by the given id', async (done) => {
 		const { status, body } = await req
 			.delete(`/api/users/${userId}`)
 			.set({ Authorization: token, Accept: 'application/json' });
