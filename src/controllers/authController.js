@@ -2,8 +2,8 @@ import UserModel from '../models/userModel';
 import { genHash, signToken } from '../helpers/auth';
 
 const signIn = async (req, res) => {
-	const { _id } = req.user;
-	const token = signToken(_id);
+	const { _id, power } = req.user;
+	const token = signToken(_id, power);
 
 	return res.status(200).json({ token });
 };
@@ -44,7 +44,7 @@ const signUp = async (req, res) => {
 		return doc;
 	});
 
-	const token = signToken(newUser.id);
+	const token = signToken(newUser.id, newUser.power);
 
 	return res.status(201).json({ token });
 };

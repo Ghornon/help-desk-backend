@@ -15,6 +15,7 @@ const users = [
 		repeatPassword: 'aaa',
 		firstName: 'Joe',
 		lastName: 'Doe',
+		power: 1,
 	},
 ];
 

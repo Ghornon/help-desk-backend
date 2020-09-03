@@ -10,13 +10,13 @@ const genHash = async (password) => {
 };
 
 // Hardcoded env variable
-const JWT_SECRET = 'secret-secure-hardcoded-variable';
+const JWT_SECRET = '!YmZd!uj@6w7b4=cG5dC';
 
-const signToken = (userID, claims) =>
+const signToken = (userId, power) =>
 	JWT.sign(
 		{
-			sub: userID,
-			claims,
+			sub: userId,
+			power,
 		},
 		JWT_SECRET,
 		{ expiresIn: '1h' }

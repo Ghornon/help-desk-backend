@@ -27,15 +27,16 @@ class TestHelper {
 		await this.seedUserCollection();
 	}
 
-	async getToken() {
+	async getToken(username, customPower) {
 		if (!this.seeds.users && !this.seeds.users.length) {
 			return null;
 		}
-		const { username } = this.seeds.users[0];
 
-		const { _id } = await UserModel.findOne({ username }).select('_id').exec();
+		const { _id, power } = await UserModel.findOne({
+			username: username || this.seeds.users[0],
+		}).exec();
 
-		return signToken(_id);
+		return signToken(_id, customPower || power);
 	}
 }
 

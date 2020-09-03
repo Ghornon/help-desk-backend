@@ -11,14 +11,14 @@ let user = {
 	repeatPassword: 'aaa',
 	firstName: 'Test',
 	lastName: 'Test',
-	power: 5,
+	power: 1,
 };
 
 let token;
 let userId;
 
 beforeAll(async () => {
-	token = await testHelper.getToken();
+	token = await testHelper.getToken('admin');
 });
 
 describe('GET /api/users', () => {
@@ -104,6 +104,35 @@ describe('GET /api/users/:id', () => {
 		const { status } = await req.get(`/api/users/${userId}`);
 
 		expect(status).toBe(401);
+		done();
+	});
+
+	it('It should return forbidden error status code', async (done) => {
+		const tokenWithoutAccess = await testHelper.getToken('joe.doe1');
+
+		const { status } = await req
+			.get(`/api/users/${userId}`)
+			.set({ Authorization: tokenWithoutAccess, Accept: 'application/json' });
+
+		expect(status).toBe(403);
+		done();
+	});
+
+	it('It should get user by the given id when logged user id is the same', async (done) => {
+		const tokenWithSelfAccess = await testHelper.getToken(user.username);
+
+		const { status, body } = await req
+			.get(`/api/users/${userId}`)
+			.set({ Authorization: tokenWithSelfAccess, Accept: 'application/json' });
+
+		expect(status).toBe(200);
+
+		Object.keys(user).forEach((key) => {
+			if (key === 'password' || key === 'repeatPassword')
+				return expect(body).not.toHaveProperty(key);
+			return expect(body).toHaveProperty(key);
+		});
+
 		done();
 	});
 
