@@ -1,12 +1,12 @@
 swagger: '2.0'
 info:
     description: This is simple API for Help Desk application.
-    version: 0.1.0
+    version: 0.2.0
     title: Help Desk API
     license:
         name: MIT
-        url: 'localhost:8080/LICENSE'
-host: localhost:8080
+        url: 'http://localhost:8080/LICENSE'
+host: 'localhost:8080'
 basePath: /api
 tags:
     - name: Auth
@@ -57,10 +57,14 @@ paths:
                     description: Created
                     schema:
                         $ref: '#/definitions/Token'
+                '400':
+                    description: Bad request
+                    schema:
+                        $ref: '#/definitions/Error'
                 '409':
                     description: Conflict
-                '500':
-                    description: Internal server error
+                    schema:
+                        $ref: '#/definitions/Error'
     /auth/login:
         post:
             tags:
@@ -88,10 +92,14 @@ paths:
                     description: Ok
                     schema:
                         $ref: '#/definitions/Token'
+                '400':
+                    description: Bad request
+                    schema:
+                        $ref: '#/definitions/Error'
                 '401':
                     description: Unauthorized
-                '500':
-                    description: Internal server error
+                    schema:
+                        $ref: '#/definitions/Error'
     /users:
         get:
             tags:
@@ -129,6 +137,8 @@ paths:
                             $ref: '#/definitions/User'
                 '404':
                     description: Not found
+                    schema:
+                        $ref: '#/definitions/Error'
         post:
             tags:
                 - Users
@@ -173,10 +183,14 @@ paths:
                     description: Created
                     schema:
                         $ref: '#/definitions/User'
+                '400':
+                    description: Bad request
+                    schema:
+                        $ref: '#/definitions/Error'
                 '409':
                     description: Conflict
-                '500':
-                    description: Internal server error
+                    schema:
+                        $ref: '#/definitions/Error'
     '/users/{userId}':
         get:
             tags:
@@ -184,8 +198,8 @@ paths:
             summary: Get user by id
             description: This can only be done by the logged in user with administrator privilege.
             parameters:
-                - name: userId
-                  in: path
+                - in: path
+                  name: userId
                   description: ID of user to return
                   required: true
                   type: string
@@ -209,11 +223,40 @@ paths:
             summary: Update user by id
             description: This can only be done by the logged in user with administrator privilege.
             parameters:
-                - name: userId
-                  in: path
+                - in: path
+                  name: userId
                   description: ID of user to return
                   required: true
                   type: string
+                - in: body
+                  name: body
+                  required: true
+                  description: You can use single property instead of updating whole document.
+                  schema:
+                      type: object
+                      properties:
+                          username:
+                              type: string
+                              example: joe.doe
+                          firstName:
+                              type: string
+                              example: Joe
+                          lastName:
+                              type: string
+                              example: Doe
+                          email:
+                              type: string
+                              example: joe.doe@email.com
+                          password:
+                              type: string
+                              example: Password1
+                          repeatPassword:
+                              type: string
+                              example: Password1
+                          power:
+                              type: integer
+                              format: int64
+                              example: 1
             operationId: updateUser
             security:
                 - api_key: []
@@ -224,12 +267,18 @@ paths:
                     description: Ok
                     schema:
                         $ref: '#/definitions/User'
+                '400':
+                    description: Bad request
+                    schema:
+                        $ref: '#/definitions/Error'
                 '404':
                     description: Not found
+                    schema:
+                        $ref: '#/definitions/Error'
                 '409':
                     description: Conflict
-                '500':
-                    description: Internal server error
+                    schema:
+                        $ref: '#/definitions/Error'
         delete:
             tags:
                 - Users
@@ -253,8 +302,8 @@ paths:
                         $ref: '#/definitions/User'
                 '404':
                     description: Not found
-                '500':
-                    description: Internal server error
+                    schema:
+                        $ref: '#/definitions/Error'
 securityDefinitions:
     api_key:
         type: apiKey
@@ -273,12 +322,16 @@ definitions:
             code:
                 type: integer
                 format: int32
+                example: 404
             message:
                 type: string
+                example: Data not found
             type:
                 type: string
+                example: client.notFound'
             context:
                 type: string
+                example: dataId
     User:
         type: object
         properties:
