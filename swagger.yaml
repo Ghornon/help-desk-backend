@@ -11,15 +11,17 @@ basePath: /api
 tags:
     - name: Auth
     - name: Users
+    - name: Cases
 schemes:
     - http
+    - https
 paths:
     /auth:
         post:
             tags:
                 - Auth
             summary: Sign up new user.
-            description: Sign up new user.
+            description: Sign up new user. No privileges needed
             operationId: signUp
             produces:
                 - application/json
@@ -104,9 +106,9 @@ paths:
         get:
             tags:
                 - Users
-            summary: Get array of users
-            description: This can only be done by the logged in user with administrator privilege.
-            operationId: getUsers
+            summary: List users
+            description: 'Returns array of users. This request needs authentication and elevated privileges (default: power 7 or above)'
+            operationId: getMultipleUsers
             security:
                 - api_key: []
             produces:
@@ -142,8 +144,8 @@ paths:
         post:
             tags:
                 - Users
-            summary: Create user
-            description: This can only be done by the logged in user with administrator privilege.
+            summary: Create new user
+            description: 'This request needs authentication and elevated privileges (default: power 5 or above).'
             operationId: createUser
             security:
                 - api_key: []
@@ -196,7 +198,7 @@ paths:
             tags:
                 - Users
             summary: Get user by id
-            description: This can only be done by the logged in user with administrator privilege.
+            description: 'This request needs authentication and property userId have to be equal to current logged user ID or user with elevated privileges (default: power 5 or above)'
             parameters:
                 - in: path
                   name: userId
@@ -221,11 +223,11 @@ paths:
             tags:
                 - Users
             summary: Update user by id
-            description: This can only be done by the logged in user with administrator privilege.
+            description: 'This request needs authentication and property userId have to be equal to current logged user ID or user with elevated privileges (default: power 5 or above)'
             parameters:
                 - in: path
                   name: userId
-                  description: ID of user to return
+                  description: ID of user to update
                   required: true
                   type: string
                 - in: body
@@ -282,12 +284,12 @@ paths:
         delete:
             tags:
                 - Users
-            summary: Update user by id
-            description: This can only be done by the logged in user with administrator privilege.
+            summary: Delete user by id
+            description: 'This request needs authentication and elevated privileges (default: power 7 or above).'
             parameters:
                 - name: userId
                   in: path
-                  description: ID of user to return
+                  description: ID of user to delete
                   required: true
                   type: string
             operationId: deleteUser
@@ -300,6 +302,211 @@ paths:
                     description: Ok
                     schema:
                         $ref: '#/definitions/User'
+                '404':
+                    description: Not found
+                    schema:
+                        $ref: '#/definitions/Error'
+    /cases:
+        get:
+            tags:
+                - Cases
+            summary: List cases
+            description: 'Return array of cases. This request needs authentication and elevated privileges (default: power 5 or above).'
+            parameters:
+                - name: operator
+                  in: query
+                  description: Username of operator to retrun
+                  type: string
+                - name: status
+                  in: query
+                  description: Status of cases to return
+                  type: string
+            operationId: listCases
+            security:
+                - api_key: []
+            produces:
+                - application/json
+            responses:
+                '200':
+                    description: Ok
+                    schema:
+                        type: array
+                        items:
+                            $ref: '#/definitions/Case'
+                '404':
+                    description: Not found
+                    schema:
+                        $ref: '#/definitions/Error'
+        post:
+            tags:
+                - Cases
+            summary: Create new case
+            description: 'This request needs authentication.'
+            parameters:
+                - in: body
+                  name: body
+                  required: true
+                  schema:
+                      type: object
+                      properties:
+                          title:
+                              type: string
+                              example: Proposing amendments
+                          priority:
+                              type: number
+                              example: 2
+                          course:
+                              type: string
+                              example: Lorem ipsum
+                          assignedOperator:
+                              type: string
+                              example: joe.doe
+            operationId: createNewCase
+            security:
+                - api_key: []
+            produces:
+                - application/json
+            responses:
+                '201':
+                    description: Created
+                    schema:
+                        $ref: '#/definitions/Case'
+                '400':
+                    description: Bad request
+                    schema:
+                        $ref: '#/definitions/Error'
+    '/cases/{caseId}':
+        get:
+            tags:
+                - Cases
+            summary: Get case by id
+            description: 'This request needs authentication and current logged user have to be document owner or elevated privileges (default: power 5 or above)'
+            parameters:
+                - in: path
+                  name: caseId
+                  description: ID of case to return
+                  required: true
+                  type: string
+            operationId: getCaseById
+            security:
+                - api_key: []
+            produces:
+                - application/json
+            responses:
+                '200':
+                    description: Ok
+                    schema:
+                        $ref: '#/definitions/Case'
+                '404':
+                    description: Not found
+                    schema:
+                        $ref: '#/definitions/Error'
+        put:
+            tags:
+                - Cases
+            summary: Update case by id
+            description: This can be executed by admin user.
+            parameters:
+                - in: path
+                  name: caseId
+                  description: ID of case to return
+                  required: true
+                  type: string
+                - in: body
+                  name: body
+                  required: true
+                  schema:
+                      type: object
+                      properties:
+                          title:
+                              type: string
+                              example: Proposing amendments
+                          priority:
+                              type: number
+                              example: 3
+                          course:
+                              type: string
+                              example: Lorem ipsum
+                          assignedOperator:
+                              type: string
+                              example: joe.doe
+                          status:
+                              type: string
+                              example: Closed
+            operationId: updateCaseById
+            security:
+                - api_key: []
+            produces:
+                - application/json
+            responses:
+                '200':
+                    description: Ok
+                    schema:
+                        $ref: '#/definitions/Case'
+                '400':
+                    description: Bad request
+                    schema:
+                        $ref: '#/definitions/Error'
+                '404':
+                    description: Not found
+                    schema:
+                        $ref: '#/definitions/Error'
+        delete:
+            tags:
+                - Cases
+            summary: Delete case by id
+            description: 'This request needs authentication and elevated privileges (default: power 7 or above).'
+            parameters:
+                - in: path
+                  name: caseId
+                  description: ID of case to delete
+                  required: true
+                  type: string
+            operationId: deleteCaseById
+            security:
+                - api_key: []
+            produces:
+                - application/json
+            responses:
+                '200':
+                    description: Ok
+                    schema:
+                        $ref: '#/definitions/Case'
+                '404':
+                    description: Not found
+                    schema:
+                        $ref: '#/definitions/Error'
+    '/cases/{caseId}/curse':
+        post:
+            tags:
+                - Cases
+            summary: Add comment to existing case
+            description: 'This request needs authentication and elevated privileges (default: power 7 or above).'
+            parameters:
+                - in: path
+                  name: caseId
+                  description: ID of case to return
+                  required: true
+                  type: string
+                - in: body
+                  name: body
+                  required: true
+                  schema:
+                      type: object
+                      properties:
+                          message:
+                              type: string
+                              example: Add new functionality foo
+            operationId: getCurse
+            security:
+                - api_key: []
+            produces:
+                - application/json
+            responses:
+                '201':
+                    description: Created
+                    schema:
+                        $ref: '#/definitions/Curse'
                 '404':
                     description: Not found
                     schema:
@@ -353,3 +560,54 @@ definitions:
             power:
                 type: integer
                 example: 1
+    Case:
+        type: object
+        properties:
+            _id:
+                type: string
+                example: 5f3bfd5d89770929aaa0e226
+            title:
+                type: string
+                example: Proposing amendments
+            createdBy:
+                $ref: '#/definitions/User'
+            status:
+                type: string
+                enum: [Open, Closed, In progress]
+                example: Open
+            priority:
+                type: number
+                example: 1
+            assignedOperator:
+                $ref: '#/definitions/User'
+            course:
+                type: array
+                items:
+                    $ref: '#/definitions/Curse'
+            createdAt:
+                type: string
+                description: ISO Date and time format in UTC
+                example: '2020-09-01T08:00:00Z'
+            updatedAt:
+                type: string
+                description: ISO Date and time format in UTC
+                example: '2014-09-03T12:00:00Z'
+    Curse:
+        type: object
+        properties:
+            _id:
+                type: string
+                example: 5f3bfd5d89770929ab10e220
+            createdBy:
+                $ref: '#/definitions/User'
+            message:
+                type: string
+                example: Add new functionality foo
+            createdAt:
+                type: string
+                description: ISO Date and time format in UTC
+                example: '2020-09-01T08:00:00Z'
+            updatedAt:
+                type: string
+                description: ISO Date and time format in UTC
+                example: '2014-09-03T12:00:00Z'
