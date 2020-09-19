@@ -5,7 +5,7 @@ import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
 
 import { connect } from './helpers/database';
-import { authRouter, usersRouter } from './routers';
+import { authRouter, usersRouter, ticketsRouter } from './routers';
 
 class App {
 	constructor() {
@@ -35,7 +35,7 @@ class App {
 			})
 		);
 
-		this.express.use('/api/', authRouter, usersRouter);
+		this.express.use('/api/', authRouter, usersRouter, ticketsRouter);
 	}
 }
 

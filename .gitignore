@@ -117,3 +117,6 @@ dist
 
 # Mongodb data volumes
 data
+
+# Editor settings
+.vscode

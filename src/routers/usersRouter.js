@@ -1,11 +1,11 @@
 import router from 'express-promise-router';
 
-import { validateBody, schemas } from '../helpers/validator';
+import { validateBody, bodySchemas } from '../helpers/validator';
 import { userController } from '../controllers';
 import passport from '../helpers/passport';
 import accessGuard from '../helpers/accessGuard';
 
-const { createUserSchema, updateUserSchema } = schemas;
+const { createUserSchema, updateUserSchema } = bodySchemas;
 
 const {
 	getUserById,

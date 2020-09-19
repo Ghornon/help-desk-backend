@@ -21,7 +21,7 @@ const validateBody = (schema) => (req, res, next) => {
 	return next();
 };
 
-const JoiKeys = {
+const schemas = {
 	User: {
 		username: Joi.string().min(5),
 		email: Joi.string().email(),
@@ -31,20 +31,40 @@ const JoiKeys = {
 		lastName: Joi.string().min(3).alphanum(),
 		power: Joi.number().integer(),
 	},
+	Ticket: {
+		title: Joi.string().min(5),
+		priority: Joi.number().valid(1, 2, 3),
+		description: Joi.string().min(5),
+	},
+	Curse: {
+		message: Joi.string().min(5).required(),
+	},
 };
 
-const schemas = {
+const bodySchemas = {
 	authSchema: Joi.object().keys({
 		username: Joi.string().required(),
 		password: Joi.string().required(),
 	}),
 	createUserSchema: Joi.object().keys({
-		...JoiKeys.User,
-		username: JoiKeys.User.username.required(),
-		email: JoiKeys.User.username.required(),
-		password: JoiKeys.User.password.required(),
+		...schemas.User,
+		username: schemas.User.username.required(),
+		email: schemas.User.email.required(),
+		password: schemas.User.password.required(),
 	}),
-	updateUserSchema: Joi.object().keys(JoiKeys.User),
+	updateUserSchema: Joi.object().keys(schemas.User),
+	createTicketSchema: Joi.object().keys({
+		...schemas.Ticket,
+		title: schemas.Ticket.title.required(),
+		priority: schemas.Ticket.priority.required(),
+		description: schemas.Ticket.description.required(),
+	}),
+	updateTicketSchema: Joi.object().keys({
+		...schemas.Ticket,
+		assignedOperator: Joi.string(),
+		status: Joi.string().valid('Open', 'Closed', 'In progress'),
+	}),
+	curseSchema: Joi.object().keys(schemas.Curse),
 };
 
-export { validateBody, schemas };
+export { validateBody, bodySchemas };

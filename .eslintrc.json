@@ -16,7 +16,8 @@
 		"linebreak-style": ["error", "unix"],
 		"semi": ["error", "always"],
 		"no-console": 1,
-		"no-tabs": 0
+		"no-tabs": 0,
+		"no-underscore-dangle": ["error", { "allow": ["_id"] }]
 	},
 	"settings": {
 		"import/resolver": {

@@ -18,9 +18,7 @@ const getUserById = async (req, res, next) => {
 	return next();
 };
 
-const getOneUser = (req, res) => {
-	return res.status(200).json(req.subject);
-};
+const getOneUser = (req, res) => res.status(200).json(req.subject);
 
 const getMultipleUsers = async (req, res) => {
 	const users = await UserModel.find(req.query).exec();

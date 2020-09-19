@@ -1,10 +1,10 @@
 import router from 'express-promise-router';
 
-import { validateBody, schemas } from '../helpers/validator';
+import { validateBody, bodySchemas } from '../helpers/validator';
 import { authController } from '../controllers';
 import passport from '../helpers/passport';
 
-const { createUserSchema, authSchema } = schemas;
+const { createUserSchema, authSchema } = bodySchemas;
 
 const { signUp, signIn } = authController;
 
