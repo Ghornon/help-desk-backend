@@ -11,7 +11,7 @@ basePath: /api
 tags:
     - name: Auth
     - name: Users
-    - name: Cases
+    - name: Tickets
 schemes:
     - http
     - https
@@ -306,22 +306,22 @@ paths:
                     description: Not found
                     schema:
                         $ref: '#/definitions/Error'
-    /cases:
+    /tickets:
         get:
             tags:
-                - Cases
-            summary: List cases
-            description: 'Return array of cases. This request needs authentication and elevated privileges (default: power 5 or above).'
+                - Tickets
+            summary: List tickets
+            description: 'Return array of tickets. This request needs authentication and elevated privileges (default: power 5 or above).'
             parameters:
                 - name: operator
                   in: query
-                  description: Username of operator to retrun
+                  description: Username of operator to return
                   type: string
                 - name: status
                   in: query
-                  description: Status of cases to return
+                  description: Status of tickets to return
                   type: string
-            operationId: listCases
+            operationId: listTickets
             security:
                 - api_key: []
             produces:
@@ -332,15 +332,15 @@ paths:
                     schema:
                         type: array
                         items:
-                            $ref: '#/definitions/Case'
+                            $ref: '#/definitions/Ticket'
                 '404':
                     description: Not found
                     schema:
                         $ref: '#/definitions/Error'
         post:
             tags:
-                - Cases
-            summary: Create new case
+                - Tickets
+            summary: Create new ticket
             description: 'This request needs authentication.'
             parameters:
                 - in: body
@@ -355,12 +355,9 @@ paths:
                           priority:
                               type: number
                               example: 2
-                          course:
+                          description:
                               type: string
                               example: Lorem ipsum
-                          assignedOperator:
-                              type: string
-                              example: joe.doe
             operationId: createNewCase
             security:
                 - api_key: []
@@ -370,21 +367,21 @@ paths:
                 '201':
                     description: Created
                     schema:
-                        $ref: '#/definitions/Case'
+                        $ref: '#/definitions/Ticket'
                 '400':
                     description: Bad request
                     schema:
                         $ref: '#/definitions/Error'
-    '/cases/{caseId}':
+    '/tickets/{ticketId}':
         get:
             tags:
-                - Cases
-            summary: Get case by id
+                - Tickets
+            summary: Get ticket by id
             description: 'This request needs authentication and current logged user have to be document owner or elevated privileges (default: power 5 or above)'
             parameters:
                 - in: path
-                  name: caseId
-                  description: ID of case to return
+                  name: ticketId
+                  description: ID of ticket to return
                   required: true
                   type: string
             operationId: getCaseById
@@ -396,20 +393,20 @@ paths:
                 '200':
                     description: Ok
                     schema:
-                        $ref: '#/definitions/Case'
+                        $ref: '#/definitions/Ticket'
                 '404':
                     description: Not found
                     schema:
                         $ref: '#/definitions/Error'
         put:
             tags:
-                - Cases
-            summary: Update case by id
+                - Tickets
+            summary: Update ticket by id
             description: This can be executed by admin user.
             parameters:
                 - in: path
-                  name: caseId
-                  description: ID of case to return
+                  name: ticketId
+                  description: ID of ticket to return
                   required: true
                   type: string
                 - in: body
@@ -424,12 +421,9 @@ paths:
                           priority:
                               type: number
                               example: 3
-                          course:
+                          description:
                               type: string
                               example: Lorem ipsum
-                          assignedOperator:
-                              type: string
-                              example: joe.doe
                           status:
                               type: string
                               example: Closed
@@ -442,7 +436,7 @@ paths:
                 '200':
                     description: Ok
                     schema:
-                        $ref: '#/definitions/Case'
+                        $ref: '#/definitions/Ticket'
                 '400':
                     description: Bad request
                     schema:
@@ -453,13 +447,13 @@ paths:
                         $ref: '#/definitions/Error'
         delete:
             tags:
-                - Cases
-            summary: Delete case by id
+                - Tickets
+            summary: Delete ticket by id
             description: 'This request needs authentication and elevated privileges (default: power 7 or above).'
             parameters:
                 - in: path
-                  name: caseId
-                  description: ID of case to delete
+                  name: ticketId
+                  description: ID of ticket to delete
                   required: true
                   type: string
             operationId: deleteCaseById
@@ -471,21 +465,21 @@ paths:
                 '200':
                     description: Ok
                     schema:
-                        $ref: '#/definitions/Case'
+                        $ref: '#/definitions/Ticket'
                 '404':
                     description: Not found
                     schema:
                         $ref: '#/definitions/Error'
-    '/cases/{caseId}/curse':
+    '/tickets/{ticketId}/course':
         post:
             tags:
-                - Cases
-            summary: Add comment to existing case
+                - Tickets
+            summary: Add comment to existing ticket
             description: 'This request needs authentication and elevated privileges (default: power 7 or above).'
             parameters:
                 - in: path
-                  name: caseId
-                  description: ID of case to return
+                  name: ticketId
+                  description: ID of ticket to return
                   required: true
                   type: string
                 - in: body
@@ -497,7 +491,7 @@ paths:
                           message:
                               type: string
                               example: Add new functionality foo
-            operationId: getCurse
+            operationId: getCourse
             security:
                 - api_key: []
             produces:
@@ -506,7 +500,7 @@ paths:
                 '201':
                     description: Created
                     schema:
-                        $ref: '#/definitions/Curse'
+                        $ref: '#/definitions/Ticket'
                 '404':
                     description: Not found
                     schema:
@@ -560,7 +554,22 @@ definitions:
             power:
                 type: integer
                 example: 1
-    Case:
+    SimpleUser:
+        type: object
+        properties:
+            _id:
+                type: string
+                example: 5f3bfd5d89770929a060e226
+            username:
+                type: string
+                example: joe.doe
+            firstName:
+                type: string
+                example: Joe
+            lastName:
+                type: string
+                example: Doe
+    Ticket:
         type: object
         properties:
             _id:
@@ -569,8 +578,11 @@ definitions:
             title:
                 type: string
                 example: Proposing amendments
+            description:
+                type: string
+                example: Lorem ipsum
             createdBy:
-                $ref: '#/definitions/User'
+                $ref: '#/definitions/SimpleUser'
             status:
                 type: string
                 enum: [Open, Closed, In progress]
@@ -579,11 +591,11 @@ definitions:
                 type: number
                 example: 1
             assignedOperator:
-                $ref: '#/definitions/User'
+                $ref: '#/definitions/SimpleUser'
             course:
                 type: array
                 items:
-                    $ref: '#/definitions/Curse'
+                    $ref: '#/definitions/Course'
             createdAt:
                 type: string
                 description: ISO Date and time format in UTC
@@ -592,14 +604,14 @@ definitions:
                 type: string
                 description: ISO Date and time format in UTC
                 example: '2014-09-03T12:00:00Z'
-    Curse:
+    Course:
         type: object
         properties:
             _id:
                 type: string
                 example: 5f3bfd5d89770929ab10e220
             createdBy:
-                $ref: '#/definitions/User'
+                $ref: '#/definitions/SimpleUser'
             message:
                 type: string
                 example: Add new functionality foo

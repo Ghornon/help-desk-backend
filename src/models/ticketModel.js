@@ -6,6 +6,7 @@ export const TicketSchema = new Schema(
 		title: String,
 		status: String,
 		priority: Number,
+		description: String,
 		assignedOperator: {
 			type: Schema.Types.ObjectId,
 			ref: 'Users',

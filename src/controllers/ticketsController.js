@@ -43,7 +43,8 @@ const createTicket = async (req, res) => {
 		priority,
 		createdBy: _id,
 		description,
-		curse: [],
+		assignedOperator: null,
+		course: [],
 	});
 
 	await newTicket.save();
@@ -60,7 +61,11 @@ const updateTicket = async (req, res) => {
 
 	const targetTicket = await TicketModel.findById(_id).exec();
 
-	targetTicket.set(req.body);
+	targetTicket.set({
+		...req.body,
+		assignedOperator: req.user._id,
+	});
+
 	await targetTicket.save();
 
 	const updatedTicket = await TicketModel.findById(_id)

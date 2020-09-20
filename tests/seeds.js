@@ -19,4 +19,9 @@ const users = [
 	},
 ];
 
-export default { users };
+const tickets = [
+	{ title: 'Test ticket', description: 'Lorem ipsum', priority: 1 },
+	{ title: 'Dolor sit amet', description: 'consectetur adipiscing elit', priority: 3 },
+];
+
+export default { users, tickets };

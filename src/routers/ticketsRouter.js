@@ -30,7 +30,7 @@ ticketsRouter
 	.put(validateBody(updateTicketSchema), updateTicket)
 	.delete(deleteTicket);
 
-ticketsRouter.route('/tickets/:ticketId/curse').post(validateBody(curseSchema), addComment);
+ticketsRouter.route('/tickets/:ticketId/course').post(validateBody(curseSchema), addComment);
 
 // Export
 export default ticketsRouter;

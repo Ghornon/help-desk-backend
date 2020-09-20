@@ -61,7 +61,6 @@ const bodySchemas = {
 	}),
 	updateTicketSchema: Joi.object().keys({
 		...schemas.Ticket,
-		assignedOperator: Joi.string(),
 		status: Joi.string().valid('Open', 'Closed', 'In progress'),
 	}),
 	curseSchema: Joi.object().keys(schemas.Curse),

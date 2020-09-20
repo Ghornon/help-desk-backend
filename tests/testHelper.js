@@ -1,4 +1,5 @@
 import UserModel from '../src/models/userModel';
+import TicketModel from '../src/models/ticketModel';
 import { genHash, signToken } from '../src/helpers/auth';
 
 import seeds from './seeds';
@@ -23,8 +24,22 @@ class TestHelper {
 		await UserModel.insertMany(newUsers);
 	}
 
+	async seedTicketsCollection() {
+		const { _id } = await UserModel.findOne({
+			username: this.seeds.users[0],
+		}).exec();
+
+		const newTickets = [...this.seeds.tickets].map((properties, index) => {
+			if (!index) return { ...properties, assignedOperator: _id };
+			return { ...properties };
+		});
+
+		await TicketModel.insertMany(newTickets);
+	}
+
 	async seedDatabase() {
 		await this.seedUserCollection();
+		await this.seedTicketsCollection();
 	}
 
 	async getToken(username, customPower) {
