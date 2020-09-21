@@ -10,9 +10,11 @@ const accessGuard = (hasRole) => (req, res, next) => {
 
 	if (hasRole === 'owner') {
 		const { userId } = req.params || {}; // When request is for /api/users/:userId
-
 		const { createdBy } = req.subject || {}; // When request is for /api/{collection}/:{collectionId}
-		if (userId === _id.toString() || createdBy === _id.toString()) return next();
+
+		const condition = userId || createdBy || req.query.createdBy || {};
+
+		if (condition.toString() === _id.toString()) return next();
 	}
 
 	if (power >= roles[hasRole]) {

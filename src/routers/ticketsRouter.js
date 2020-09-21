@@ -1,5 +1,6 @@
 import router from 'express-promise-router';
 import passport from '../helpers/passport';
+import accessGuard from '../helpers/accessGuard';
 
 import {
 	getTicketById,
@@ -21,16 +22,18 @@ ticketsRouter.param('ticketId', getTicketById);
 
 ticketsRouter
 	.route('/tickets')
-	.get(getMultipleTickets)
+	.get(accessGuard('owner'), getMultipleTickets)
 	.post(validateBody(createTicketSchema), createTicket);
 
 ticketsRouter
 	.route('/tickets/:ticketId')
-	.get(getOneTicket)
-	.put(validateBody(updateTicketSchema), updateTicket)
-	.delete(deleteTicket);
+	.get(accessGuard('owner'), getOneTicket)
+	.put(accessGuard('mod'), validateBody(updateTicketSchema), updateTicket)
+	.delete(accessGuard('admin'), deleteTicket);
 
-ticketsRouter.route('/tickets/:ticketId/course').post(validateBody(curseSchema), addComment);
+ticketsRouter
+	.route('/tickets/:ticketId/course')
+	.post(accessGuard('owner'), validateBody(curseSchema), addComment);
 
 // Export
 export default ticketsRouter;
